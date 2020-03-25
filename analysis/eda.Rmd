@@ -1,0 +1,83 @@
+---
+title: "IMPC EDA"
+author: "Bin Li"
+date: "`r Sys.Date()`"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+```{r}
+library(data.table)
+library(dplyr)
+library(reshape2)
+library(tidyr)
+library(ggplot2)
+```
+
+
+#### Read KOMPv10.1
+```{r}
+KOMPv10.1.file = "~/Box Sync/Miami_IMPC/data/v10.1/IMPC_ALL_statistical_results.csv.gz"
+KOMPv10.1 = fread(KOMPv10.1.file, header=TRUE, sep=",")
+```
+
+#### Subset data and generate Z-score
+```{r}
+clinical_chem = KOMPv10.1 %>% 
+  select(procedure_name, parameter_name, zygosity, allele_symbol,
+         genotype_effect_parameter_estimate, genotype_effect_stderr_estimate,
+         genotype_effect_p_value) %>% 
+  filter(procedure_name == "Clinical Chemistry", zygosity == "homozygote") %>% 
+  mutate(z_score = genotype_effect_parameter_estimate/genotype_effect_stderr_estimate,
+         gene_pheno = paste0(parameter_name, "_", allele_symbol))
+head(clinical_chem)
+```
+
+#### z-matrix and heatmap
+```{r}
+#select necessary for z-score matrix
+matrix = clinical_chem %>% 
+  select(allele_symbol, parameter_name, z_score)
+head(matrix)
+```
+
+#### long to wide 
+```{r}
+new_matrix = acast(matrix, allele_symbol ~ parameter_name, value.var = "z_score",
+                   fun.aggregate = sum)
+data_matrix = as.data.frame(new_matrix)
+data_matrix[is.na(data_matrix)] = 0
+
+
+long_matrix = data_matrix %>% 
+  gather(key = "parameter_name", value = "z_score", 1:48)
+
+head(long_matrix)
+
+data = expand.grid(gene = rownames(data_matrix), pheno=colnames(data_matrix))
+data$Z_score=long_matrix$z_score
+
+#ggplot(data = data, aes(x= gene, y = pheno, fill =Z_score)) +
+  #geom_tile() +
+  #scale_fill_gradient(low="white",high="blue") +
+  #theme(axis.text.x = element_text(angle = 90))
+#-------------------------------------------------------------------------------------------------
+# long to wide (Small) 
+new_matrix_small = acast(matrix[1:500, ], allele_symbol ~ parameter_name, value.var = "z_score")
+data_matrix_small = as.data.frame(new_matrix_small)
+data_matrix_small[is.na(data_matrix_small)] = 0
+
+
+long_matrix_small = data_matrix_small %>% 
+  gather(key = "parameter_name", value = "z_score", 1:36)
+
+data_small = expand.grid(gene = rownames(data_matrix_small), pheno=colnames(data_matrix_small))
+data_small$Z_score=long_matrix_small$z_score
+
+ggplot(data = data_small, aes(x= gene, y = pheno, fill =Z_score)) +
+  geom_tile() +
+  scale_fill_gradient(low="white",high="blue") +
+  theme(axis.text.x = element_text(angle = 90))
+
+```
