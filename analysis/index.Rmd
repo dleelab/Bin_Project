@@ -8,4 +8,10 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+#### EDA analysis -  (Week 1 March 23 - March 27)
+* [EDA analysis](eda.html)
+
+#### 
+
+
+
