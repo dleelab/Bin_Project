@@ -16,13 +16,13 @@ library(ggplot2)
 ```
 
 
-#### Read KOMPv10.1
+### Read KOMPv10.1
 ```{r}
 KOMPv10.1.file = "~/Box Sync/Miami_IMPC/data/v10.1/IMPC_ALL_statistical_results.csv.gz"
 KOMPv10.1 = fread(KOMPv10.1.file, header=TRUE, sep=",")
 ```
 
-#### Subset data and generate Z-score
+### Subset data and generate Z-score
 ```{r}
 clinical_chem = KOMPv10.1 %>% 
   select(procedure_name, parameter_name, zygosity, allele_symbol,
@@ -34,7 +34,7 @@ clinical_chem = KOMPv10.1 %>%
 head(clinical_chem)
 ```
 
-#### z-matrix and heatmap
+### z-matrix and heatmap
 ```{r}
 #select necessary for z-score matrix
 matrix = clinical_chem %>% 
@@ -42,7 +42,7 @@ matrix = clinical_chem %>%
 head(matrix)
 ```
 
-#### long to wide 
+### long to wide 
 ```{r}
 new_matrix = acast(matrix, allele_symbol ~ parameter_name, value.var = "z_score",
                    fun.aggregate = sum)
