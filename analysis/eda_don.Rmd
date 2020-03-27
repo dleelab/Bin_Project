@@ -1,0 +1,57 @@
+---
+title: "IMPC EDA"
+author: "Donghyung Lee"
+date: "`r Sys.Date()`"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Load packages
+```{r}
+library(data.table)
+library(dplyr)
+library(reshape2)
+library(tidyr)
+library(ggplot2)
+```
+
+
+## Read KOMPv10.1
+```{r}
+KOMPv10.1.file = "~/Box Sync/Miami_IMPC/data/v10.1/IMPC_ALL_statistical_results.csv.gz"
+KOMPv10.1 = fread(KOMPv10.1.file, header=TRUE, sep=",")
+```
+
+## Subset data and generate Z-score
+```{r}
+clinical_chem = KOMPv10.1 %>% 
+  select(procedure_name, parameter_name, zygosity, allele_symbol,
+         genotype_effect_parameter_estimate, genotype_effect_stderr_estimate,
+         genotype_effect_p_value) %>% 
+  filter(procedure_name == "Clinical Chemistry", zygosity == "homozygote") %>% 
+  mutate(z_score = genotype_effect_parameter_estimate/genotype_effect_stderr_estimate,
+         gene_pheno = paste0(parameter_name, "_", allele_symbol))
+head(clinical_chem)
+```
+
+## Dive into Clinical Chemistry data
+
+### 1. How many gene-phenotype pairs?
+```{r}
+nrow(clinical_chem)
+```
+### 2. How many genes tested?
+```{r}
+num.gene <- length(unique(clinical_chem$allele_symbol))
+num.gene
+```
+### 3. How many phenotypes measured?
+```{r}
+num.pheno <- length(unique(clinical_chem$parameter_name))
+num.pheno
+```
+### 4. Proportion of missing information (gene-phenotype pairs)
+```{r}
+100*nrow(clinical_chem)/(num.gene*num.pheno)
+```
