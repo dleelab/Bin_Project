@@ -10,8 +10,12 @@ editor_options:
 
 #### EDA analysis -  (Week 1 March 23 - March 27)
 * [EDA analysis](eda.html)
+* [EDA analysis - Don] (eda_don.html)
 
-#### 
 
+
+
+#### phenotype correlations
+* [correlation between phenotypes](cor_pheno.html)
 
 
