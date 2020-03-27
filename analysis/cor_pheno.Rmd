@@ -68,7 +68,7 @@ dim(pheno.mat)
 ```
 
 ## Compute correlations between phenotypes
-```{r, fig.width=6, fig.height=2}
+```{r, fig.width=8, fig.height=4}
 pheno.cor <- cor(pheno.mat, use="pairwise.complete.obs")
 pheatmap(pheno.cor, cluster_rows = F, cluster_cols=F, show_colnames=F, col=brewer.pal(n=11,name="RdBu"))
 ```
