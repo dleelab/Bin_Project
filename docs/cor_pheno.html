@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Donghyung Lee" />
+
+<meta name="date" content="2020-03-26" />
+
+<title>Correlations between phenotypes</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">IMPC data analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="https://github.com/dleelab/Bin_Project">GitHub</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Correlations between phenotypes</h1>
+<h4 class="author">Donghyung Lee</h4>
+<h4 class="date">2020-03-26</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2020-03-26
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>Bin_Project/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.4.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200325code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200325)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200325code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200325)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdleelabBinProjecttree36f89deb0a66cc3be636ee5fc50c4acdb02b07f6targetblank36f89dea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/dleelab/Bin_Project/tree/36f89deb0a66cc3be636ee5fc50c4acdb02b07f6" target="_blank">36f89de</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdleelabBinProjecttree36f89deb0a66cc3be636ee5fc50c4acdb02b07f6targetblank36f89dea" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+
+Untracked files:
+    Untracked:  analysis/eda_don.Rmd
+    Untracked:  docs/figure/cor_pheno.Rmd/
+
+Unstaged changes:
+    Modified:   analysis/index.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the R Markdown and HTML files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view them.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/dleelab/Bin_Project/blob/36f89deb0a66cc3be636ee5fc50c4acdb02b07f6/analysis/cor_pheno.Rmd" target="_blank">36f89de</a>
+</td>
+<td>
+dleelab
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+c
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/dleelab/Bin_Project/blob/1f345a9f72186ad6d03757b58c3835f96bc0cbfe/analysis/cor_pheno.Rmd" target="_blank">1f345a9</a>
+</td>
+<td>
+dleelab
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+size
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/dleelab/Bin_Project/blob/b80d48758f7c819aa772213fc07f9b2169063672/analysis/cor_pheno.Rmd" target="_blank">b80d487</a>
+</td>
+<td>
+dleelab
+</td>
+<td>
+2020-03-27
+</td>
+<td>
+c
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="load-packages" class="section level2">
+<h2>Load packages</h2>
+<pre class="r"><code>rm(list=ls())
+#library(data.table)
+#library(reshape2)
+#library(ggplot2)
+
+library(dplyr)</code></pre>
+<pre><code>
+Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    filter, lag</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(tidyr)
+library(pheatmap)
+library(RColorBrewer)</code></pre>
+</div>
+<div id="read-raw-phenotypes" class="section level2">
+<h2>Read raw phenotypes</h2>
+<pre class="r"><code>pheno.file = &quot;~/Box Sync/Miami_IMPC/data/v10.1/AllBehaviourControls.Rdata&quot;
+load(file=pheno.file)
+pheno = df %&gt;% filter(data_type!=&quot;TEXT&quot;) %&gt;% 
+  mutate(proc_short_name=recode(procedure_name, &quot;Acoustic Startle and Pre-pulse Inhibition (PPI)&quot;=&quot;PPI&quot;,
+         &quot;Combined SHIRPA and Dysmorphology&quot;=&quot;SHIRPA&quot;,
+         &quot;Fear Conditioning&quot;=&quot;FEAR&quot;,
+         &quot;Grip Strength&quot;=&quot;GRIP&quot;,
+         &quot;Hole-board Exploration&quot;=&quot;HB&quot;,
+         &quot;Light-Dark Test&quot;=&quot;LD&quot;,
+         &quot;Open Field&quot;=&quot;OF&quot;,
+         &quot;Rotarod&quot;=&quot;RT&quot;,
+         &quot;Tail Suspension&quot;=&quot;TS&quot;)) %&gt;%
+  mutate(proc_param_name=paste0(proc_short_name,&quot;_&quot;,parameter_name))
+dim(pheno)</code></pre>
+<pre><code>[1] 357765     76</code></pre>
+</div>
+<div id="heatmap-showing-measured-phenotypes" class="section level2">
+<h2>Heatmap showing measured phenotypes</h2>
+<p>This heatmaps show phenotypes measured for each control mouse. Rows represent mice and columns represents phenotypes.</p>
+<pre class="r"><code>mtest &lt;- table(pheno$biological_sample_id, pheno$proc_param_name)
+mtest &lt;-as.data.frame.matrix(mtest)
+pheatmap(mtest, cluster_rows = F, cluster_cols=F, show_rownames=F, color=brewer.pal(n=9,name=&quot;Reds&quot;))</code></pre>
+<p><img src="figure/cor_pheno.Rmd/unnamed-chunk-3-1.png" width="576" style="display: block; margin: auto;" /> SHIRPA, PPI, OF and GRIP phenotypes are measured for most of control mice. So we compute correlations of these phenotypes.</p>
+</div>
+<div id="subsetting-shirpa-ppi-of-grip" class="section level2">
+<h2>Subsetting SHIRPA, PPI, OF, GRIP</h2>
+<pre class="r"><code>pheno.sub &lt;- pheno %&gt;% filter(proc_short_name==&quot;SHIRPA&quot;|
+                                proc_short_name==&quot;PPI&quot;|
+                                proc_short_name==&quot;OF&quot;|
+                                proc_short_name==&quot;GRIP&quot;)
+dim(pheno.sub)</code></pre>
+<pre><code>[1] 323604     76</code></pre>
+</div>
+<div id="reshape-the-data-long-to-wide-format" class="section level2">
+<h2>Reshape the data (long to wide format)</h2>
+<pre class="r"><code>pheno.mat &lt;- pheno.sub %&gt;% 
+  select(biological_sample_id, proc_param_name, data_point) %&gt;%
+  spread(proc_param_name, data_point) %&gt;%
+  tibble::column_to_rownames(var=&quot;biological_sample_id&quot;)
+dim(pheno.mat)</code></pre>
+<pre><code>[1] 30419    14</code></pre>
+</div>
+<div id="compute-correlations-between-phenotypes" class="section level2">
+<h2>Compute correlations between phenotypes</h2>
+<pre class="r"><code>pheno.cor &lt;- cor(pheno.mat, use=&quot;pairwise.complete.obs&quot;)
+pheatmap(pheno.cor, cluster_rows = F, cluster_cols=F, show_colnames=F, col=brewer.pal(n=11,name=&quot;RdBu&quot;))</code></pre>
+<p><img src="figure/cor_pheno.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="etc" class="section level2">
+<h2>ETC</h2>
+<pre class="r"><code>## number of domains
+length(unique(pheno$procedure_name))</code></pre>
+<pre><code>[1] 9</code></pre>
+<pre class="r"><code>unique(pheno$procedure_name)</code></pre>
+<pre><code>[1] &quot;Acoustic Startle and Pre-pulse Inhibition (PPI)&quot;
+[2] &quot;Grip Strength&quot;                                  
+[3] &quot;Open Field&quot;                                     
+[4] &quot;Combined SHIRPA and Dysmorphology&quot;              
+[5] &quot;Fear Conditioning&quot;                              
+[6] &quot;Light-Dark Test&quot;                                
+[7] &quot;Rotarod&quot;                                        
+[8] &quot;Hole-board Exploration&quot;                         
+[9] &quot;Tail Suspension&quot;                                </code></pre>
+<pre class="r"><code>table(pheno$procedure_name)</code></pre>
+<pre><code>
+Acoustic Startle and Pre-pulse Inhibition (PPI) 
+                                         134822 
+              Combined SHIRPA and Dysmorphology 
+                                          23444 
+                              Fear Conditioning 
+                                          10144 
+                                  Grip Strength 
+                                          56222 
+                         Hole-board Exploration 
+                                           3361 
+                                Light-Dark Test 
+                                          12448 
+                                     Open Field 
+                                         109116 
+                                        Rotarod 
+                                           6870 
+                                Tail Suspension 
+                                           1338 </code></pre>
+<pre class="r"><code>## number of phenotypes in each domain
+pheno %&gt;% group_by(procedure_name) %&gt;% summarise(num.pheno=length(unique(parameter_name)))</code></pre>
+<pre><code># A tibble: 9 x 2
+  procedure_name                                  num.pheno
+  &lt;chr&gt;                                               &lt;int&gt;
+1 Acoustic Startle and Pre-pulse Inhibition (PPI)         6
+2 Combined SHIRPA and Dysmorphology                       1
+3 Fear Conditioning                                       4
+4 Grip Strength                                           2
+5 Hole-board Exploration                                  1
+6 Light-Dark Test                                         4
+7 Open Field                                              5
+8 Rotarod                                                 4
+9 Tail Suspension                                         1</code></pre>
+<pre class="r"><code>## number of observations in each domain &amp; phenotype
+pheno %&gt;% group_by(procedure_name, parameter_name) %&gt;% summarise(num.obs=length(parameter_name))</code></pre>
+<pre><code># A tibble: 28 x 3
+# Groups:   procedure_name [9]
+   procedure_name                      parameter_name               num.obs
+   &lt;chr&gt;                               &lt;chr&gt;                          &lt;int&gt;
+ 1 Acoustic Startle and Pre-pulse Inh… % Pre-pulse inhibition - Gl…   24440
+ 2 Acoustic Startle and Pre-pulse Inh… % Pre-pulse inhibition - PP…   24440
+ 3 Acoustic Startle and Pre-pulse Inh… % Pre-pulse inhibition - PP…   24440
+ 4 Acoustic Startle and Pre-pulse Inh… % Pre-pulse inhibition - PP…   24440
+ 5 Acoustic Startle and Pre-pulse Inh… % Pre-pulse inhibition - PP…   12610
+ 6 Acoustic Startle and Pre-pulse Inh… Response amplitude - S         24452
+ 7 Combined SHIRPA and Dysmorphology   Locomotor activity             23444
+ 8 Fear Conditioning                   Conditioning Baseline % Fre…    2536
+ 9 Fear Conditioning                   Context % Freezing Time         2536
+10 Fear Conditioning                   Cue Baseline % Freezing Time    2536
+# … with 18 more rows</code></pre>
+<pre class="r"><code>table(pheno$biological_model_id, pheno$strain_name)</code></pre>
+<pre><code>       
+        B6Brd;B6Dnk;B6N-Tyr&lt;c-Brd&gt; C57BL/6N C57BL/6NCrl C57BL/6NJ
+  39064                          0        0           0         0
+  40139                          0        0           0         0
+  40140                          0        0       90790         0
+  41648                          0        0           0         0
+  41959                          0    82810           0         0
+  46056                        366        0           0         0
+  47815                          0        0           0     64981
+       
+        C57BL/6NJcl C57BL/6NTac
+  39064           0           3
+  40139           0      111307
+  40140           0           0
+  41648        7508           0
+  41959           0           0
+  46056           0           0
+  47815           0           0</code></pre>
+<pre class="r"><code>table(pheno$zygosity)</code></pre>
+<pre><code>
+homozygote 
+    357765 </code></pre>
+<pre class="r"><code>table(pheno$sex)</code></pre>
+<pre><code>
+female   male 
+178504 179261 </code></pre>
+<pre class="r"><code>table(pheno$production_center)</code></pre>
+<pre><code>
+        BCM     CCP-IMG        HMGU         ICS         JAX        KMPC 
+      20765       20451       43037       36066       64981       10538 
+       MARC MRC Harwell        RBRC         TCP    UC Davis        WTSI 
+      19917       63096       19679       19106       33701        6428 </code></pre>
+<pre class="r"><code>table(pheno$procedure_name, pheno$production_center)</code></pre>
+<pre><code>                                                 
+                                                    BCM CCP-IMG  HMGU
+  Acoustic Startle and Pre-pulse Inhibition (PPI)  9895    6756 16734
+  Combined SHIRPA and Dysmorphology                1265    1132  3124
+  Fear Conditioning                                   0    4568     0
+  Grip Strength                                    4292    2290  5843
+  Hole-board Exploration                              0       0     0
+  Light-Dark Test                                     0       0     0
+  Open Field                                       5313    5705 15713
+  Rotarod                                             0       0  1623
+  Tail Suspension                                     0       0     0
+                                                 
+                                                    ICS   JAX  KMPC  MARC
+  Acoustic Startle and Pre-pulse Inhibition (PPI) 14394 19067  4650  7480
+  Combined SHIRPA and Dysmorphology                2334  3151   806  1398
+  Fear Conditioning                                   0     0   364     0
+  Grip Strength                                    4840  6696  1606  3380
+  Hole-board Exploration                              0  3361     0     0
+  Light-Dark Test                                     0 11124     0     0
+  Open Field                                      12085 17410  3112  7659
+  Rotarod                                          2413  2834     0     0
+  Tail Suspension                                     0  1338     0     0
+                                                 
+                                                  MRC Harwell  RBRC   TCP
+  Acoustic Startle and Pre-pulse Inhibition (PPI)       25739  7944  6618
+  Combined SHIRPA and Dysmorphology                      4963  1680  1108
+  Fear Conditioning                                         0     0  2396
+  Grip Strength                                          9789  3370  2190
+  Hole-board Exploration                                    0     0     0
+  Light-Dark Test                                           0     0  1324
+  Open Field                                            22605  6685  5470
+  Rotarod                                                   0     0     0
+  Tail Suspension                                           0     0     0
+                                                 
+                                                  UC Davis  WTSI
+  Acoustic Startle and Pre-pulse Inhibition (PPI)    15545     0
+  Combined SHIRPA and Dysmorphology                   2483     0
+  Fear Conditioning                                   2816     0
+  Grip Strength                                       5498  6428
+  Hole-board Exploration                                 0     0
+  Light-Dark Test                                        0     0
+  Open Field                                          7359     0
+  Rotarod                                                0     0
+  Tail Suspension                                        0     0</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.1 (2019-07-05)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS Mojave 10.14.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] RColorBrewer_1.1-2 pheatmap_1.0.12    tidyr_1.0.0       
+[4] dplyr_0.8.3       
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.2       pillar_1.4.2     compiler_3.6.1   git2r_0.26.1    
+ [5] workflowr_1.4.0  tools_3.6.1      zeallot_0.1.0    digest_0.6.20   
+ [9] evaluate_0.14    tibble_2.1.3     lifecycle_0.1.0  gtable_0.3.0    
+[13] pkgconfig_2.0.2  rlang_0.4.5      cli_1.1.0        yaml_2.2.0      
+[17] xfun_0.9         stringr_1.4.0    knitr_1.24       fs_1.3.1        
+[21] vctrs_0.2.0      rprojroot_1.3-2  grid_3.6.1       tidyselect_0.2.5
+[25] glue_1.3.1       R6_2.4.0         fansi_0.4.0      rmarkdown_1.15  
+[29] purrr_0.3.3      magrittr_1.5     whisker_0.3-2    backports_1.1.4 
+[33] scales_1.0.0     htmltools_0.3.6  assertthat_0.2.1 colorspace_1.4-1
+[37] utf8_1.1.4       stringi_1.4.3    munsell_0.5.0    crayon_1.3.4    </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
