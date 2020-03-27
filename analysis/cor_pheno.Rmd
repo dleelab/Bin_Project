@@ -1,0 +1,93 @@
+---
+title: "Correlations between phenotypes"
+author: "Donghyung Lee"
+date: "`r Sys.Date()`"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Load packages
+```{r}
+rm(list=ls())
+#library(data.table)
+#library(reshape2)
+#library(ggplot2)
+
+library(dplyr)
+library(tidyr)
+library(pheatmap)
+library(RColorBrewer)
+```
+
+
+## Read raw phenotypes
+```{r}
+pheno.file = "~/Box Sync/Miami_IMPC/data/v10.1/AllBehaviourControls.Rdata"
+load(file=pheno.file)
+pheno = df %>% filter(data_type!="TEXT") %>% 
+  mutate(proc_short_name=recode(procedure_name, "Acoustic Startle and Pre-pulse Inhibition (PPI)"="PPI",
+         "Combined SHIRPA and Dysmorphology"="SHIRPA",
+         "Fear Conditioning"="FEAR",
+         "Grip Strength"="GRIP",
+         "Hole-board Exploration"="HB",
+         "Light-Dark Test"="LD",
+         "Open Field"="OF",
+         "Rotarod"="RT",
+         "Tail Suspension"="TS")) %>%
+  mutate(proc_param_name=paste0(proc_short_name,"_",parameter_name))
+dim(pheno)
+```
+
+## Heatmap showing measured phenotypes 
+
+This heatmaps show phenotypes measured for each control mouse. Rows represent mice and columns represents phenotypes. 
+```{r, fig.width=6, fig.height=8}
+mtest <- table(pheno$biological_sample_id, pheno$proc_param_name)
+mtest <-as.data.frame.matrix(mtest)
+pheatmap(mtest, cluster_rows = F, cluster_cols=F, show_rownames=F, color=brewer.pal(n=9,name="Reds"))
+```
+SHIRPA, PPI, OF and GRIP phenotypes are measured for most of control mice. So we compute correlations of these phenotypes.
+
+## Subsetting SHIRPA, PPI, OF, GRIP
+```{r} 
+pheno.sub <- pheno %>% filter(proc_short_name=="SHIRPA"|
+                                proc_short_name=="PPI"|
+                                proc_short_name=="OF"|
+                                proc_short_name=="GRIP")
+dim(pheno.sub)
+```
+
+## Reshape the data (long to wide format)
+```{r}
+pheno.mat <- pheno.sub %>% 
+  select(biological_sample_id, proc_param_name, data_point) %>%
+  spread(proc_param_name, data_point) %>%
+  tibble::column_to_rownames(var="biological_sample_id")
+dim(pheno.mat)
+```
+
+## Compute correlations between phenotypes
+```{r, fig.width=6, fig.height=2}
+pheno.cor <- cor(pheno.mat, use="pairwise.complete.obs")
+pheatmap(pheno.cor, cluster_rows = F, cluster_cols=F, show_colnames=F, col=brewer.pal(n=11,name="RdBu"))
+```
+
+
+## ETC
+```{r}
+## number of domains
+length(unique(pheno$procedure_name))
+unique(pheno$procedure_name)
+table(pheno$procedure_name)
+## number of phenotypes in each domain
+pheno %>% group_by(procedure_name) %>% summarise(num.pheno=length(unique(parameter_name)))
+## number of observations in each domain & phenotype
+pheno %>% group_by(procedure_name, parameter_name) %>% summarise(num.obs=length(parameter_name))
+
+table(pheno$biological_model_id, pheno$strain_name)
+table(pheno$zygosity)
+table(pheno$sex)
+table(pheno$production_center)
+table(pheno$procedure_name, pheno$production_center)
+```
