@@ -7,8 +7,23 @@ editor_options:
   chunk_output_type: console
 ---
 
+
+## Load packages
 ```{r}
-pheno.file = "~/Desktop/GWAS/AllBehaviourControls.Rdata"
+rm(list=ls())
+#library(data.table)
+#library(reshape2)
+#library(ggplot2)
+
+library(dplyr)
+library(tidyr)
+library(pheatmap)
+library(RColorBrewer)
+```
+
+
+```{r}
+pheno.file = "~/Box Sync/Miami_IMPC/data/v10.1/AllBehaviourControls.Rdata"
 load(file=pheno.file)
 head(df)
 
