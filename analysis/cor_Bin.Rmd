@@ -1,8 +1,10 @@
 ---
-title: "cor_Bin"
-author: "Bin Li"
-date: "4/1/2020"
-output: html_document
+title: "Correlation analysis"
+author: "Bin Lee"
+date: "2020-04-03"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
 ---
 
 ```{r}
@@ -34,4 +36,6 @@ mtest = as.data.frame.matrix(mtest)
 pheatmap(mtest, cluster_row = F, cluster_cols = F, show_rownames = F, color = brewer.pal(n = 9, name = "Reds"))
 
 ```
+
+
 
