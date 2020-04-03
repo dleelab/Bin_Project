@@ -18,8 +18,9 @@ library(ggplot2)
 
 ### Read KOMPv10.1
 ```{r}
-KOMPv10.1.file = "~/Box Sync/Miami_IMPC/data/v10.1/IMPC_ALL_statistical_results.csv.gz"
+KOMPv10.1.file = "/Users/dorylee/Desktop/GWAS/v10.1/IMPC_ALL_statistical_results.csv.gz"
 KOMPv10.1 = fread(KOMPv10.1.file, header=TRUE, sep=",")
+head(KOMPv10.1, 10)
 ```
 
 ### Subset data and generate Z-score
@@ -27,7 +28,7 @@ KOMPv10.1 = fread(KOMPv10.1.file, header=TRUE, sep=",")
 clinical_chem = KOMPv10.1 %>% 
   select(procedure_name, parameter_name, zygosity, allele_symbol,
          genotype_effect_parameter_estimate, genotype_effect_stderr_estimate,
-         genotype_effect_p_value) %>% 
+         genotype_effect_p_value, phenotyping_center, allele_name) %>% 
   filter(procedure_name == "Clinical Chemistry", zygosity == "homozygote") %>% 
   mutate(z_score = genotype_effect_parameter_estimate/genotype_effect_stderr_estimate,
          gene_pheno = paste0(parameter_name, "_", allele_symbol))
@@ -48,6 +49,8 @@ new_matrix = acast(matrix, allele_symbol ~ parameter_name, value.var = "z_score"
                    fun.aggregate = sum)
 data_matrix = as.data.frame(new_matrix)
 data_matrix[is.na(data_matrix)] = 0
+head(data.matrix)
+
 
 
 long_matrix = data_matrix %>% 
@@ -57,6 +60,7 @@ head(long_matrix)
 
 data = expand.grid(gene = rownames(data_matrix), pheno=colnames(data_matrix))
 data$Z_score=long_matrix$z_score
+head(data)
 
 #ggplot(data = data, aes(x= gene, y = pheno, fill =Z_score)) +
   #geom_tile() +
@@ -81,3 +85,94 @@ ggplot(data = data_small, aes(x= gene, y = pheno, fill =Z_score)) +
   theme(axis.text.x = element_text(angle = 90))
 
 ```
+
+#------------------- Week 04/03 --------------------#
+
+2. EDA
+(1) How many gene-phenotypes pairs are measured?
+```{r}
+nrow(clinical_chem)
+```
+
+(2) How many phenotypes are tested?
+```{r}
+chem_pheno = length(unique(clinical_chem$parameter_name))
+chem_pheno
+```
+
+(3) How many genes are tested?
+```{r}
+chem_gene = length(unique(clinical_chem$allele_symbol))
+chem_gene
+```
+
+(4) How many research institutions are participating in this project?
+```{r}
+#phenotyping center
+chem_ins = length(unique(clinical_chem$phenotyping_center))
+chem_ins
+
+#allele(gene) name
+chem_allel = length(unique(clinical_chem$allele_name))
+chem_allel
+
+```
+
+(5) What kind of phenotypes are tested in each research institution?
+```{r}
+clinical_chem %>% 
+  mutate(phenotyping_center = as.factor(phenotyping_center)) %>% 
+  select(phenotyping_center, parameter_name) %>% 
+  group_by(phenotyping_center, parameter_name) %>% 
+  summarize(test=n())
+  
+```
+
+(6) How many gene-phenotype tests are sigificant?
+```{r}
+clinical_chem %>% 
+  filter(genotype_effect_p_value < 0.05) %>% 
+  summarise(n())
+
+clinical_chem %>% 
+  select(allele_symbol, parameter_name, genotype_effect_p_value) %>% 
+  group_by(allele_symbol, parameter_name) %>% 
+  filter(genotype_effect_p_value < 0.05) %>% 
+  summarise(n())
+```
+
+3. Correlation  matrix and heatmap
+
+```{r}
+zscore = clinical_chem %>% 
+  select(allele_symbol, parameter_name, z_score)
+head(zscore)
+
+zmat = dcast(zscore, allele_symbol ~ parameter_name, value.var = "z_score", 
+             fun.aggregate = mean)
+
+head(zmat)
+
+zcor = cor(zmat[,-1],use="pairwise.complete.obs")
+
+pheatmap(zcor, cluster_rows = F, cluster_cols=F, show_colnames=F, col=brewer.pal(n=11,name="RdBu"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
