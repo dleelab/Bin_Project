@@ -1,0 +1,37 @@
+---
+title: "cor_Bin"
+author: "Bin Li"
+date: "4/1/2020"
+output: html_document
+---
+
+```{r}
+pheno.file = "~/Desktop/GWAS/AllBehaviourControls.Rdata"
+load(file=pheno.file)
+head(df)
+
+pheno = df %>% filter(data_type!="TEXT") %>% 
+  mutate(proc_short_name=recode(procedure_name, "Acoustic Startle and Pre-pulse Inhibition (PPI)"="PPI",
+         "Combined SHIRPA and Dysmorphology"="SHIRPA",
+         "Fear Conditioning"="FEAR",
+         "Grip Strength"="GRIP",
+         "Hole-board Exploration"="HB",
+         "Light-Dark Test"="LD",
+         "Open Field"="OF",
+         "Rotarod"="RT",
+         "Tail Suspension"="TS")) %>%
+  mutate(proc_param_name=paste0(proc_short_name,"_",parameter_name))
+head(pheno)
+
+dim(pheno)
+```
+
+## Heatmap showing measured phenotype
+```{r, fig.width=6, fig.height=8}
+
+mtest = table(pheno$biological_sample_id, pheno$proc_param_name)
+mtest = as.data.frame.matrix(mtest)
+pheatmap(mtest, cluster_row = F, cluster_cols = F, show_rownames = F, color = brewer.pal(n = 9, name = "Reds"))
+
+```
+
