@@ -23,7 +23,7 @@ library(RColorBrewer)
 
 
 ```{r}
-pheno.file = "~/Box Sync/Miami_IMPC/data/v10.1/AllBehaviourControls.Rdata"
+pheno.file = "~/Box/Miami_IMPC/data/v10.1/AllBehaviourControls.Rdata"
 load(file=pheno.file)
 head(df)
 
