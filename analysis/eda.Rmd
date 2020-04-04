@@ -18,7 +18,7 @@ library(ggplot2)
 
 ### Read KOMPv10.1
 ```{r}
-KOMPv10.1.file = "/Users/dorylee/Desktop/GWAS/v10.1/IMPC_ALL_statistical_results.csv.gz"
+KOMPv10.1.file = "~/box/Miami_IMPC/data/v10.1/IMPC_ALL_statistical_results.csv.gz"
 KOMPv10.1 = fread(KOMPv10.1.file, header=TRUE, sep=",")
 head(KOMPv10.1, 10)
 ```
