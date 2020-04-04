@@ -1,6 +1,6 @@
 ---
 title: "Correlation analysis"
-author: "Bin Lee"
+author: "Bin Li"
 date: "2020-04-03"
 output: workflowr::wflow_html
 editor_options:
